@@ -1,0 +1,1102 @@
+/* ==========================================================================
+   NECROTERM: GHOST IN THE MACHINE
+   Retro-Gothic CRT Terminal & Occult Spirit Box
+   Hacktoberfest 2026 // Week 4
+   ========================================================================== */
+
+:root {
+  /* Default Blood Crimson Palette */
+  --bg-primary: #0a0203;
+  --bg-secondary: #140507;
+  --bg-surface: #1f070b;
+  --bg-surface-glass: rgba(28, 7, 11, 0.75);
+  --border-color: rgba(255, 42, 75, 0.35);
+  --border-glow: rgba(255, 42, 75, 0.7);
+  --text-main: #ffcad1;
+  --text-dim: #a85864;
+  --text-bright: #ffffff;
+  --accent-color: #ff2a4b;
+  --accent-glow: 0 0 12px rgba(255, 42, 75, 0.65), 0 0 24px rgba(255, 42, 75, 0.3);
+  --spirit-color: #00e5ff;
+  --spirit-glow: 0 0 10px rgba(0, 229, 255, 0.6);
+  --crt-scanline-color: rgba(18, 0, 3, 0.4);
+  --crt-flicker: 0.015;
+}
+
+/* Theme: Phosphor Green (EVP Matrix) */
+body.theme-phosphor-green {
+  --bg-primary: #020a04;
+  --bg-secondary: #051408;
+  --bg-surface: #08210d;
+  --bg-surface-glass: rgba(8, 33, 13, 0.75);
+  --border-color: rgba(0, 255, 102, 0.35);
+  --border-glow: rgba(0, 255, 102, 0.7);
+  --text-main: #b8ffd1;
+  --text-dim: #4d8f61;
+  --text-bright: #ffffff;
+  --accent-color: #00ff66;
+  --accent-glow: 0 0 12px rgba(0, 255, 102, 0.65), 0 0 24px rgba(0, 255, 102, 0.3);
+  --spirit-color: #79fffc;
+  --spirit-glow: 0 0 10px rgba(121, 255, 252, 0.6);
+  --crt-scanline-color: rgba(0, 16, 4, 0.4);
+}
+
+/* Theme: Amber Crypt (Vintage 1983 Mainframe) */
+body.theme-amber-crypt {
+  --bg-primary: #0d0600;
+  --bg-secondary: #170b01;
+  --bg-surface: #261303;
+  --bg-surface-glass: rgba(38, 19, 3, 0.75);
+  --border-color: rgba(255, 157, 0, 0.35);
+  --border-glow: rgba(255, 157, 0, 0.7);
+  --text-main: #ffe2b8;
+  --text-dim: #996e38;
+  --text-bright: #ffffff;
+  --accent-color: #ff9d00;
+  --accent-glow: 0 0 12px rgba(255, 157, 0, 0.65), 0 0 24px rgba(255, 157, 0, 0.3);
+  --spirit-color: #ffd175;
+  --spirit-glow: 0 0 10px rgba(255, 209, 117, 0.6);
+  --crt-scanline-color: rgba(20, 8, 0, 0.4);
+}
+
+/* Theme: Spectral Cyan (Phantom Ether) */
+body.theme-spectral-cyan {
+  --bg-primary: #01080c;
+  --bg-secondary: #02121c;
+  --bg-surface: #041f2e;
+  --bg-surface-glass: rgba(4, 31, 46, 0.75);
+  --border-color: rgba(0, 229, 255, 0.35);
+  --border-glow: rgba(0, 229, 255, 0.7);
+  --text-main: #c4f7ff;
+  --text-dim: #4d8f99;
+  --text-bright: #ffffff;
+  --accent-color: #00e5ff;
+  --accent-glow: 0 0 12px rgba(0, 229, 255, 0.65), 0 0 24px rgba(0, 229, 255, 0.3);
+  --spirit-color: #ff66ea;
+  --spirit-glow: 0 0 10px rgba(255, 102, 234, 0.6);
+  --crt-scanline-color: rgba(0, 10, 18, 0.4);
+}
+
+/* Theme: Día de los Muertos (Marigold & Candle Altar) */
+body.theme-marigold-ofrenda {
+  --bg-primary: #0a040d;
+  --bg-secondary: #14071c;
+  --bg-surface: #240c33;
+  --bg-surface-glass: rgba(36, 12, 51, 0.75);
+  --border-color: rgba(255, 179, 0, 0.4);
+  --border-glow: rgba(255, 107, 0, 0.75);
+  --text-main: #ffe9cc;
+  --text-dim: #a6729e;
+  --text-bright: #ffffff;
+  --accent-color: #ffaa00;
+  --accent-glow: 0 0 14px rgba(255, 170, 0, 0.7), 0 0 28px rgba(230, 81, 0, 0.4);
+  --spirit-color: #ea80fc;
+  --spirit-glow: 0 0 12px rgba(234, 128, 252, 0.6);
+  --crt-scanline-color: rgba(14, 3, 20, 0.4);
+}
+
+/* Global Reset */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background-color: var(--bg-primary);
+  color: var(--text-main);
+  font-family: 'Share Tech Mono', 'Fira Code', monospace;
+  font-size: 15px;
+  line-height: 1.5;
+  user-select: none;
+}
+
+/* CRT Screen Enclosure */
+.crt-frame {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: radial-gradient(circle at center, var(--bg-secondary) 0%, var(--bg-primary) 95%);
+  overflow: hidden;
+}
+
+/* Authentic CRT Overlay Effects */
+.crt-glass {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.03) 0%, rgba(0, 0, 0, 0.35) 85%);
+  z-index: 50;
+}
+
+.crt-scanlines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    transparent 50%,
+    var(--crt-scanline-color) 51%
+  );
+  background-size: 100% 4px;
+  opacity: 0.75;
+  z-index: 51;
+  animation: scanlineJitter 10s linear infinite;
+}
+
+.crt-vignette {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.85), inset 0 0 40px rgba(0, 0, 0, 0.95);
+  border: 1px solid var(--border-color);
+  z-index: 52;
+}
+
+/* Screen Shake on Full Possession */
+.screen-shake {
+  animation: possessedShake 0.4s infinite ease-in-out;
+}
+
+/* ==========================================================================
+   Top Occult Status Bar
+   ========================================================================== */
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  background-color: var(--bg-surface-glass);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border-color);
+  z-index: 40;
+  position: relative;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+}
+
+.bar-left, .bar-center, .bar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Cinzel Decorative', serif;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+
+.rune-glyph {
+  font-size: 20px;
+  color: var(--accent-color);
+  text-shadow: var(--accent-glow);
+  animation: runePulse 3s infinite ease-in-out;
+}
+
+.logo-text {
+  font-size: 17px;
+  color: var(--text-bright);
+  text-shadow: 0 0 8px var(--accent-color);
+}
+
+.logo-badge {
+  font-size: 10px;
+  padding: 2px 6px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  color: var(--text-dim);
+  font-family: 'Fira Code', monospace;
+}
+
+/* Spirit Pill */
+.spirit-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  font-size: 12px;
+}
+
+.pill-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--spirit-color);
+  box-shadow: var(--spirit-glow);
+  animation: spiritPulse 2s infinite ease-in-out;
+}
+
+.pill-label {
+  color: var(--text-dim);
+  font-size: 11px;
+}
+
+.pill-val {
+  color: var(--spirit-color);
+  font-weight: bold;
+  text-shadow: var(--spirit-glow);
+}
+
+/* Ectoplasm Resonance Gauge */
+.gauge-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.45);
+  padding: 4px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+}
+
+.gauge-label {
+  font-size: 11px;
+  color: var(--text-dim);
+  letter-spacing: 0.5px;
+}
+
+.gauge-bar-track {
+  width: 110px;
+  height: 8px;
+  background-color: rgba(0, 0, 0, 0.6);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.gauge-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--text-dim), var(--accent-color));
+  box-shadow: var(--accent-glow);
+  transition: width 0.4s ease, background 0.4s ease;
+}
+
+.gauge-pct {
+  font-size: 12px;
+  font-weight: bold;
+  color: var(--accent-color);
+  min-width: 34px;
+}
+
+.gauge-status {
+  font-size: 10px;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 3px;
+  letter-spacing: 0.5px;
+}
+
+.badge-dormant {
+  background-color: #2b2b2b;
+  color: #888;
+}
+
+.badge-restless {
+  background-color: rgba(255, 157, 0, 0.25);
+  color: #ff9d00;
+  border: 1px solid rgba(255, 157, 0, 0.5);
+}
+
+.badge-manifesting {
+  background-color: rgba(255, 42, 75, 0.3);
+  color: #ff2a4b;
+  border: 1px solid rgba(255, 42, 75, 0.6);
+  animation: glowBlink 1.5s infinite;
+}
+
+.badge-possessed {
+  background-color: #ff2a4b;
+  color: #ffffff;
+  box-shadow: 0 0 10px #ff2a4b;
+  animation: rapidFlash 0.5s infinite;
+}
+
+/* Bar Buttons */
+.bar-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  color: var(--text-main);
+  font-family: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.bar-btn:hover {
+  background-color: var(--accent-color);
+  color: var(--bg-primary);
+  border-color: var(--text-bright);
+  box-shadow: var(--accent-glow);
+}
+
+.bar-btn.btn-highlight {
+  border-color: var(--spirit-color);
+  color: var(--spirit-color);
+  box-shadow: var(--spirit-glow);
+}
+
+.bar-btn.btn-highlight:hover {
+  background-color: var(--spirit-color);
+  color: #000;
+}
+
+/* ==========================================================================
+   EVP Oscilloscope & Frequency Bar
+   ========================================================================== */
+.evp-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 16px;
+  background-color: rgba(0, 0, 0, 0.6);
+  border-bottom: 1px dashed var(--border-color);
+  z-index: 35;
+  gap: 16px;
+}
+
+.evp-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.evp-tag {
+  color: var(--text-dim);
+}
+
+.evp-freq {
+  color: var(--accent-color);
+  font-weight: bold;
+  letter-spacing: 1px;
+  text-shadow: var(--accent-glow);
+}
+
+.evp-indicator {
+  font-size: 10px;
+  color: var(--spirit-color);
+  text-shadow: var(--spirit-glow);
+  animation: signalFlicker 1.8s infinite;
+}
+
+.evp-canvas-box {
+  flex: 1;
+  max-width: 600px;
+  height: 36px;
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+#evp-canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.evp-slider-box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mini-label {
+  font-size: 10px;
+  color: var(--text-dim);
+}
+
+input[type="range"] {
+  accent-color: var(--accent-color);
+  cursor: pointer;
+}
+
+/* ==========================================================================
+   Virtual Terminal & Output
+   ========================================================================== */
+.terminal-wrapper {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 12px 18px;
+  z-index: 30;
+  user-select: text;
+}
+
+.terminal-screen {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-right: 6px;
+  scroll-behavior: smooth;
+}
+
+/* Custom Scrollbar */
+.terminal-screen::-webkit-scrollbar {
+  width: 6px;
+}
+.terminal-screen::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.4);
+}
+.terminal-screen::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 3px;
+}
+.terminal-screen::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-color);
+}
+
+.terminal-output {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+  word-break: break-word;
+}
+
+/* Output Item Styling */
+.term-line {
+  line-height: 1.45;
+  white-space: pre-wrap;
+}
+
+.term-cmd-echo {
+  color: var(--text-bright);
+  font-weight: 500;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.term-prompt-prefix {
+  color: var(--accent-color);
+  user-select: none;
+}
+
+.term-output-text {
+  color: var(--text-main);
+  padding-left: 12px;
+}
+
+.term-banner {
+  font-family: 'VT323', monospace;
+  font-size: 16px;
+  color: var(--accent-color);
+  text-shadow: var(--accent-glow);
+  margin-bottom: 8px;
+  line-height: 1.15;
+}
+
+.term-ghost-whisper {
+  position: relative;
+  margin: 6px 0 8px 12px;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.55);
+  border-left: 3px solid var(--spirit-color);
+  color: var(--spirit-color);
+  font-style: italic;
+  font-family: 'Share Tech Mono', monospace;
+  text-shadow: var(--spirit-glow);
+  border-radius: 0 4px 4px 0;
+  animation: whisperGlitch 0.3s ease-in-out;
+}
+
+.whisper-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-style: normal;
+  color: var(--text-dim);
+  margin-bottom: 4px;
+}
+
+.whisper-glyph {
+  font-size: 13px;
+  color: var(--spirit-color);
+}
+
+.whisper-text {
+  font-size: 13.5px;
+  line-height: 1.4;
+}
+
+.term-error {
+  color: #ff3355;
+  font-weight: bold;
+  text-shadow: 0 0 6px rgba(255, 51, 85, 0.6);
+  padding-left: 12px;
+}
+
+.term-success {
+  color: #00ff88;
+  padding-left: 12px;
+}
+
+.term-dim {
+  color: var(--text-dim);
+}
+
+.term-table {
+  border-collapse: collapse;
+  margin: 6px 0 6px 12px;
+  font-size: 13px;
+}
+
+.term-table th {
+  text-align: left;
+  color: var(--accent-color);
+  border-bottom: 1px solid var(--border-color);
+  padding: 4px 12px 4px 0;
+}
+
+.term-table td {
+  padding: 3px 12px 3px 0;
+  color: var(--text-main);
+}
+
+/* Prompt Input Line */
+.terminal-input-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding-top: 6px;
+  border-top: 1px dotted rgba(255, 255, 255, 0.08);
+}
+
+.prompt-user {
+  color: var(--accent-color);
+  font-weight: bold;
+}
+
+.prompt-separator {
+  color: var(--text-dim);
+}
+
+.prompt-path {
+  color: var(--spirit-color);
+}
+
+.prompt-symbol {
+  color: var(--text-bright);
+  font-weight: bold;
+}
+
+.input-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.cmd-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-bright);
+  font-family: 'Fira Code', 'Share Tech Mono', monospace;
+  font-size: 15px;
+  caret-color: var(--accent-color);
+}
+
+.cmd-input::placeholder {
+  color: rgba(255, 255, 255, 0.22);
+  font-style: italic;
+}
+
+/* ==========================================================================
+   Quick Action Spellbar
+   ========================================================================== */
+.spellbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  background-color: var(--bg-surface-glass);
+  border-top: 1px solid var(--border-color);
+  z-index: 35;
+  overflow-x: auto;
+}
+
+.spell-title {
+  font-size: 11px;
+  font-weight: bold;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+.spell-buttons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+}
+
+.spell-btn {
+  background-color: rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  padding: 3px 8px;
+  font-family: 'Fira Code', monospace;
+  font-size: 11px;
+  border-radius: 3px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.spell-btn:hover {
+  background-color: var(--accent-color);
+  color: var(--bg-primary);
+  border-color: var(--text-bright);
+  box-shadow: var(--accent-glow);
+  transform: translateY(-1px);
+}
+
+/* ==========================================================================
+   Modals & Popups
+   ========================================================================== */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 16px;
+}
+
+.modal-backdrop.hidden {
+  display: none;
+}
+
+.modal-box {
+  width: 100%;
+  max-width: 540px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.9), var(--accent-glow);
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+  overflow: hidden;
+  animation: modalEnter 0.25s ease-out;
+}
+
+.modal-large {
+  max-width: 800px;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  background-color: rgba(0, 0, 0, 0.4);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.modal-header h3 {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 15px;
+  color: var(--accent-color);
+  text-shadow: var(--accent-glow);
+  letter-spacing: 0.5px;
+}
+
+.btn-close-modal {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 20px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.btn-close-modal:hover {
+  color: var(--accent-color);
+}
+
+.modal-body {
+  padding: 16px 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.modal-intro {
+  font-size: 13px;
+  color: var(--text-main);
+  line-height: 1.4;
+}
+
+.config-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.config-field label {
+  font-size: 12px;
+  color: var(--text-bright);
+}
+
+.field-hint {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.modal-input, .modal-select {
+  background-color: rgba(0, 0, 0, 0.6);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 8px 10px;
+  color: var(--text-bright);
+  font-family: inherit;
+  font-size: 13px;
+  outline: none;
+}
+
+.modal-input:focus, .modal-select:focus {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 8px var(--accent-color);
+}
+
+.config-subfields {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 10px 12px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px dashed var(--border-color);
+  border-radius: 6px;
+}
+
+.config-subfields.hidden {
+  display: none;
+}
+
+.test-conn-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.modal-action-btn {
+  padding: 6px 12px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  color: var(--text-main);
+  font-family: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.modal-action-btn:hover {
+  background-color: var(--accent-color);
+  color: #000;
+  box-shadow: var(--accent-glow);
+}
+
+.modal-action-btn.btn-primary {
+  background-color: var(--accent-color);
+  color: #000;
+  font-weight: bold;
+  border-color: var(--text-bright);
+  box-shadow: var(--accent-glow);
+}
+
+.test-status {
+  font-size: 12px;
+}
+
+.test-status.success {
+  color: #00ff88;
+}
+
+.test-status.error {
+  color: #ff3355;
+}
+
+.gemma-prompt-preview {
+  margin-top: 6px;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.7);
+  border-left: 3px solid var(--accent-color);
+  border-radius: 0 4px 4px 0;
+}
+
+.preview-title {
+  font-size: 11px;
+  color: var(--accent-color);
+  display: block;
+  margin-bottom: 4px;
+}
+
+.gemma-tokens {
+  font-family: 'Fira Code', monospace;
+  font-size: 11.5px;
+  color: var(--spirit-color);
+  white-space: pre-wrap;
+}
+
+.modal-footer {
+  padding: 12px 18px;
+  background-color: rgba(0, 0, 0, 0.4);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* ==========================================================================
+   Séance Grid & Spirit Cards
+   ========================================================================== */
+.spirits-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 12px;
+}
+
+.spirit-card {
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.spirit-card:hover, .spirit-card.selected {
+  border-color: var(--spirit-color);
+  background: rgba(0, 229, 255, 0.08);
+  box-shadow: var(--spirit-glow);
+  transform: translateY(-2px);
+}
+
+.spirit-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.spirit-avatar {
+  font-size: 24px;
+}
+
+.spirit-era {
+  font-size: 10px;
+  color: var(--text-dim);
+  padding: 2px 5px;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 3px;
+}
+
+.spirit-name {
+  font-size: 14px;
+  font-weight: bold;
+  color: var(--text-bright);
+}
+
+.spirit-title {
+  font-size: 11px;
+  color: var(--accent-color);
+}
+
+.spirit-desc {
+  font-size: 11.5px;
+  color: var(--text-main);
+  line-height: 1.35;
+}
+
+.spirit-quote {
+  font-size: 11px;
+  font-style: italic;
+  color: var(--spirit-color);
+  margin-top: 4px;
+  border-left: 2px solid var(--spirit-color);
+  padding-left: 6px;
+}
+
+/* ==========================================================================
+   DEV Community Submission Textarea
+   ========================================================================== */
+.export-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.submission-textarea {
+  width: 100%;
+  height: 340px;
+  background-color: rgba(0, 0, 0, 0.7);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 12px;
+  color: var(--text-bright);
+  font-family: 'Fira Code', monospace;
+  font-size: 12px;
+  line-height: 1.45;
+  resize: vertical;
+  outline: none;
+}
+
+/* ==========================================================================
+   Tarot Card Visualizer
+   ========================================================================== */
+.tarot-spread {
+  display: flex;
+  gap: 12px;
+  margin: 10px 0;
+  flex-wrap: wrap;
+}
+
+.tarot-card {
+  flex: 1;
+  min-width: 140px;
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid var(--accent-color);
+  border-radius: 6px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.tarot-icon {
+  font-size: 28px;
+}
+
+.tarot-name {
+  font-size: 12px;
+  font-weight: bold;
+  color: var(--accent-color);
+}
+
+.tarot-meaning {
+  font-size: 11px;
+  color: var(--text-main);
+}
+
+/* ==========================================================================
+   Animations
+   ========================================================================== */
+@keyframes runePulse {
+  0%, 100% { opacity: 0.85; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.12); filter: drop-shadow(0 0 8px var(--accent-color)); }
+}
+
+@keyframes spiritPulse {
+  0%, 100% { opacity: 0.6; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+@keyframes glowBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes rapidFlash {
+  0%, 100% { background-color: var(--accent-color); color: #fff; }
+  50% { background-color: #000; color: var(--accent-color); }
+}
+
+@keyframes signalFlicker {
+  0%, 100% { opacity: 0.9; }
+  30% { opacity: 0.4; }
+  60% { opacity: 1; }
+  85% { opacity: 0.2; }
+}
+
+@keyframes scanlineJitter {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(4px); }
+}
+
+@keyframes possessedShake {
+  0% { transform: translate(1px, 1px) rotate(0deg); }
+  20% { transform: translate(-2px, -1px) rotate(-0.5deg); }
+  40% { transform: translate(-1px, 2px) rotate(0.5deg); }
+  60% { transform: translate(2px, 1px) rotate(0deg); }
+  80% { transform: translate(1px, -2px) rotate(-0.5deg); }
+  100% { transform: translate(-1px, 1px) rotate(0.5deg); }
+}
+
+@keyframes whisperGlitch {
+  0% { opacity: 0; transform: translateX(-8px); filter: blur(3px); }
+  50% { opacity: 0.8; transform: translateX(2px); }
+  100% { opacity: 1; transform: translateX(0); filter: blur(0); }
+}
+
+@keyframes modalEnter {
+  from { opacity: 0; transform: scale(0.95) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .top-bar {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .bar-right .btn-text {
+    display: none;
+  }
+  .gauge-bar-track {
+    width: 60px;
+  }
+  .evp-canvas-box {
+    max-width: 250px;
+  }
+}

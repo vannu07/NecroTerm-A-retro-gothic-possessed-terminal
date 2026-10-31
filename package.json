@@ -1,0 +1,15 @@
+{
+  "name": "necroterm",
+  "version": "1.0.0",
+  "description": "A possessed retro-gothic terminal and spirit box powered by Google open-weight Gemma for Hacktoberfest 2026 Week 4",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^8.3.5"
+  }
+}
